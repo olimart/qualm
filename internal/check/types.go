@@ -23,6 +23,7 @@ type Options struct {
 	NoCache      bool
 	CacheDir     string  // empty for the user cache directory
 	Budget       float64 // dollars, 1 when 0
+	Model        string  // QUALM_MODEL, empty for qualm.json or the default
 	Client       *jev.Client
 	Now          func() time.Time // nil for time.Now
 }

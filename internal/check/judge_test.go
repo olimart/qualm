@@ -124,7 +124,7 @@ func TestRunSendsEachFileOnceWithItsDiffTheNoteTheLanguageAndEveryQuestion(t *te
 		t.Errorf("state for bin/tool = %v, want %v with no language", tool.State, wantState)
 	}
 	for _, c := range []call{ruby, tool} {
-		if c.Model != "typesafe/jev-1.13" {
+		if c.Model != "typesafe/jev-1.14" {
 			t.Errorf("model = %q, want the default", c.Model)
 		}
 		if len(c.Questions) != len(builtinIDs) {

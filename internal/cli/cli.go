@@ -51,6 +51,9 @@ Flags:
 Exit codes: 0 the gate passed, 1 the gate failed, 2 qualm couldn't run
 `
 
+// ModelEnvVar overrides the model in qualm.json for this run.
+const ModelEnvVar = "QUALM_MODEL"
+
 // settings is what the command line asked for.
 type settings struct {
 	base, format, cache, reason string
@@ -238,6 +241,7 @@ func (s *settings) options(env Env) (check.Options, error) {
 		NoCache:      s.noCache,
 		CacheDir:     s.cache,
 		Budget:       s.budget,
+		Model:        env.Getenv(ModelEnvVar),
 		Client:       &jev.Client{Endpoint: env.Endpoint, Key: env.Getenv(jev.KeyVar)},
 	}, nil
 }

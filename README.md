@@ -36,6 +36,10 @@ export OPENROUTER_API_KEY=...
 qualm
 ```
 
+Qualm uses `typesafe/jev-1.14` by default. Set `QUALM_MODEL` to select a
+different OpenRouter decision model for a run; it overrides the `model` value
+in `qualm.json`.
+
 Run it in a git repository. It compares your working tree with the merge base of `HEAD` and the default branch, so it works before you commit as well as in CI.
 
 `qualm` exits 0 when nothing drew a qualm. It exits 1 when the gate fails. It exits 2 when it couldn't run: no key, no network, a mistake in the config, a spent budget. It never passes a change it couldn't judge.

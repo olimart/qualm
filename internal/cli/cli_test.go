@@ -52,6 +52,7 @@ type fakeJev struct {
 	pushBack float64
 	status   int // 0 for 200
 	requests atomic.Int32
+	models   []string
 }
 
 func newFakeJev(t *testing.T, pushBack float64) *fakeJev {
@@ -73,11 +74,15 @@ func (f *fakeJev) serve(w http.ResponseWriter, r *http.Request) {
 	}
 	body, _ := io.ReadAll(r.Body)
 	var req struct {
+		Model string `json:"model"`
 		Questions map[string]struct {
 			Type string `json:"type"`
 		} `json:"questions"`
 	}
 	_ = json.Unmarshal(body, &req)
+	f.mu.Lock()
+	f.models = append(f.models, req.Model)
+	f.mu.Unlock()
 	answers := map[string]any{}
 	for id, q := range req.Questions {
 		switch q.Type {
@@ -101,6 +106,12 @@ func (f *fakeJev) serve(w http.ResponseWriter, r *http.Request) {
 }
 
 func (f *fakeJev) count() int { return int(f.requests.Load()) }
+
+func (f *fakeJev) requestedModels() []string {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return slices.Clone(f.models)
+}
 
 func git(t *testing.T, dir string, args ...string) {
 	t.Helper()
@@ -144,9 +155,10 @@ type outcome struct {
 }
 
 type world struct {
-	dir  string
-	fake *fakeJev
-	key  string
+	dir   string
+	fake  *fakeJev
+	key   string
+	model string
 }
 
 func newWorld(t *testing.T, pushBack float64) *world {
@@ -164,8 +176,11 @@ func (w *world) runIn(t *testing.T, dir string, args ...string) outcome {
 	t.Helper()
 	var out, errb bytes.Buffer
 	getenv := func(k string) string {
-		if k == "OPENROUTER_API_KEY" {
+		switch k {
+		case "OPENROUTER_API_KEY":
 			return w.key
+		case "QUALM_MODEL":
+			return w.model
 		}
 		return ""
 	}
@@ -188,6 +203,20 @@ func (w *world) runCached(t *testing.T, cache string, args ...string) outcome {
 func TestVersionIsThreeNumbers(t *testing.T) {
 	if !regexp.MustCompile(`^\d+\.\d+\.\d+$`).MatchString(Version) {
 		t.Fatalf("Version = %q, want three numbers with dots between", Version)
+	}
+}
+
+func TestModelEnvironmentVariableOverridesTheRepositoryConfig(t *testing.T) {
+	w := newWorld(t, 0.2)
+	w.model = "parallel/decisions-fast:free"
+	write(t, w.dir, "qualm.json", `{"model":"typesafe/jev-1.13"}`)
+
+	o := w.run(t)
+	if o.code != 0 {
+		t.Fatalf("run: %+v", o)
+	}
+	if got := w.fake.requestedModels(); !slices.Equal(got, []string{w.model}) {
+		t.Errorf("models = %q, want %q", got, []string{w.model})
 	}
 }
 

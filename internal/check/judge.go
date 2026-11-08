@@ -86,7 +86,7 @@ func newJudge(o Options, cfg config.Config, qs []questions.Question) (*judge, er
 	j := &judge{
 		client: o.Client,
 		budget: jev.NewBudget(cmp.Or(o.Budget, defaultBudget)),
-		model:  cmp.Or(cfg.Model, config.DefaultModel),
+		model:  cmp.Or(o.Model, cfg.Model, config.DefaultModel),
 		qs:     qs,
 		jobs:   o.Jobs,
 	}

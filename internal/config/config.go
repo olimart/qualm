@@ -16,8 +16,8 @@ import (
 // File is the config's name at the repository root.
 const File = "qualm.json"
 
-// DefaultModel is the Jev model used when the config names none.
-const DefaultModel = "typesafe/jev-1.13"
+// DefaultModel is the Jev model used when neither the environment nor config names one.
+const DefaultModel = "typesafe/jev-1.14"
 
 // Gate changes the default gate's question or threshold. A zero field means not set.
 type Gate struct {
