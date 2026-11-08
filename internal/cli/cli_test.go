@@ -74,7 +74,7 @@ func (f *fakeJev) serve(w http.ResponseWriter, r *http.Request) {
 	}
 	body, _ := io.ReadAll(r.Body)
 	var req struct {
-		Model string `json:"model"`
+		Model     string `json:"model"`
 		Questions map[string]struct {
 			Type string `json:"type"`
 		} `json:"questions"`

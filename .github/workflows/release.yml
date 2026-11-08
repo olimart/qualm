@@ -53,7 +53,7 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: .ruby-version
+          ruby-version: "3.3"
 
       # A release that cannot pass its own suite is not a release. CI already
       # ran this on the commit; running it again here costs a minute and
